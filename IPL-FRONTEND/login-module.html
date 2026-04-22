@@ -1,0 +1,130 @@
+<!-- Login Module -->
+<div id="loginModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <button class="team-modal-close" onclick="closeLoginModal()" style="position: absolute; top: 15px; right: 15px;">&times;</button>
+        <div class="team-modal-header">
+            <div class="team-modal-logo" style="width: 80px; height: 80px; margin: 0 auto 15px;">🏏</div>
+            <h2 class="team-modal-name">Welcome Back!</h2>
+            <p class="team-modal-subtitle">Login to predict matches</p>
+        </div>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <input type="text" id="loginUsername" class="form-input" placeholder="Username" required>
+                <label class="form-label">Username</label>
+            </div>
+            <div class="form-group">
+                <input type="password" id="loginPassword" class="form-input" placeholder="Password" required>
+                <label class="form-label">Password</label>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <input type="checkbox" id="rememberMe" style="width: 18px; height: 18px;">
+                <label for="rememberMe" style="color: #666; font-size: 14px;">Remember me</label>
+            </div>
+            <button type="submit" class="modal-submit-btn">
+                <div class="modal-submit-content">
+                    <span class="btn-icon">🔑</span>
+                    Login
+                </div>
+                <div class="modal-submit-glow"></div>
+            </button>
+        </form>
+        <p style="text-align: center; margin-top: 15px; color: #666;">
+            Don't have an account? <a href="#" onclick="switchToSignup(event)" style="color: #9333ea; font-weight: 600;">Sign Up</a>
+        </p>
+        <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #f3e8ff, #ede9fe); border-radius: 10px;">
+            <p style="color: #9333ea; font-size: 12px; margin: 0; text-align: center;">
+                <strong>Demo Login:</strong><br>
+                Username: <code>IPLFan</code><br>
+                Password: <code>password123</code>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Login Module Functions
+    let currentUser = null;
+
+    function openLoginModal() {
+        document.getElementById('loginModal').classList.add('active');
+    }
+
+    function closeLoginModal() {
+        document.getElementById('loginModal').classList.remove('active');
+    }
+
+    function openLogin() {
+        openLoginModal();
+    }
+
+    async function handleLogin(event) {
+        event.preventDefault();
+        
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+
+        if (!username || !password) {
+            alert('Please enter your username and password.');
+            return;
+        }
+
+        let result;
+        try {
+            const response = await fetch(`${API_BASE}/auth?action=login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ username, password })
+            });
+
+            const payload = await response.json();
+            result = response.ok ? { success: true, user: payload } : { success: false, message: payload.error || 'Invalid credentials' };
+        } catch (error) {
+            alert('Login failed: ' + error.message);
+            return;
+        }
+
+        if (result.success) {
+            currentUser = result.user;
+            alert(`Welcome ${currentUser.username}! 🎉`);
+            closeLoginModal();
+            document.querySelector('.main-content').style.display = 'block';
+            updateNavigation();
+            showSection('predict');
+            loadTodayMatch();
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+    }
+
+    function switchToSignup(event) {
+        event.preventDefault();
+        alert('Sign Up feature coming soon!');
+    }
+
+    function logout() {
+        currentUser = null;
+        location.reload();
+    }
+
+    function updateNavigation() {
+        if (currentUser) {
+            document.querySelector('.nav-buttons').innerHTML = `
+                <span class="nav-user">👤 ${currentUser.username}</span>
+                <button onclick="logout()">Logout</button>
+            `;
+        }
+    }
+
+    async function checkSession() {
+        try {
+            const response = await fetch(`${API_BASE}/auth`, { credentials: 'include' });
+            if (response.ok) {
+                currentUser = await response.json();
+            }
+        } catch (error) {
+            currentUser = null;
+        }
+    }
+</script>

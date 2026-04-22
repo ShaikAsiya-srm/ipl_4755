@@ -1,0 +1,16 @@
+com\ipl\backend\controller\PredictionController.class
+com\ipl\backend\service\UserService.class
+com\ipl\backend\controller\MatchController.class
+com\ipl\backend\service\LeaderboardService.class
+com\ipl\backend\service\IplScraperService.class
+com\ipl\backend\model\User.class
+com\ipl\backend\service\PredictionService.class
+com\ipl\backend\util\DBConnection.class
+com\ipl\backend\controller\AuthController.class
+com\ipl\backend\controller\LeaderboardController.class
+com\ipl\backend\model\Match.class
+com\ipl\backend\IplBackendApplication.class
+com\ipl\backend\controller\UserController.class
+com\ipl\backend\service\MatchService.class
+com\ipl\backend\model\Prediction.class
+com\ipl\backend\config\WebConfig.class

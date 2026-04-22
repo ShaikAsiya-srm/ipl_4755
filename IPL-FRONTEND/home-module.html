@@ -1,0 +1,185 @@
+<!-- Home / Prediction Module -->
+
+<!-- Hero Banner -->
+<div style="background: linear-gradient(135deg, #c91b8f 0%, #8b1a62 50%, #5c1a6e 100%); border-radius: 24px; padding: 60px 50px; margin-bottom: 40px; position: relative; overflow: hidden; box-shadow: 0 20px 60px rgba(201, 27, 143, 0.4);">
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 30% 70%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(139, 26, 110, 0.2) 0%, transparent 50%);"></div>
+    <div style="position: relative; z-index: 1;">
+        <h1 style="color: white; font-size: 56px; font-weight: 900; margin: 0 0 15px; text-shadow: 0 4px 20px rgba(0,0,0,0.4); letter-spacing: 3px;">
+            <span style="color: #ffd700;">🏏 IPL</span> 2026
+        </h1>
+        <p style="color: rgba(255,255,255,0.9); font-size: 24px; margin: 0 0 25px; font-weight: 500;">Predict Winners • Win Big 🎯</p>
+        <div style="display: inline-flex; gap: 30px; justify-content: center;">
+            <div style="text-align: center;">
+                <div style="color: #ffd700; font-size: 40px; font-weight: 900;">10</div>
+                <div style="color: rgba(255,255,255,0.8); font-size: 14px; text-transform: uppercase;">Teams</div>
+            </div>
+            <div style="width: 1px; background: rgba(255,255,255,0.3);"></div>
+            <div style="text-align: center;">
+                <div style="color: #ffd700; font-size: 40px; font-weight: 900;">74</div>
+                <div style="color: rgba(255,255,255,0.8); font-size: 14px; text-transform: uppercase;">Matches</div>
+            </div>
+            <div style="width: 1px; background: rgba(255,255,255,0.3);"></div>
+            <div style="text-align: center;">
+                <div style="color: #ffd700; font-size: 40px; font-weight: 900;">50</div>
+                <div style="color: rgba(255,255,255,0.8); font-size: 14px; text-transform: uppercase;">Days</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Today's Match Card -->
+<div style="background: white; border-radius: 24px; box-shadow: 0 25px 70px rgba(168, 85, 247, 0.25); overflow: hidden; margin-bottom: 40px; border: 3px solid #e9d5ff;">
+    <!-- Match Header -->
+    <div style="background: linear-gradient(135deg, #9333ea, #c084fc); padding: 25px 40px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="width: 12px; height: 12px; background: #22c55e; border-radius: 50%; animation: pulse 1.5s infinite; box-shadow: 0 0 15px #22c55e;"></div>
+            <h3 style="color: white; margin: 0; font-size: 22px; font-weight: 800;">Today's Match</h3>
+        </div>
+        <span style="background: white; color: #9333ea; padding: 8px 22px; border-radius: 25px; font-size: 14px; font-weight: 700;">⚡ LIVE</span>
+    </div>
+    
+    <!-- Match Content -->
+    <div style="padding: 60px 40px;">
+        <div id="todayMatchContent" style="display: flex; align-items: center; justify-content: center; gap: 80px; flex-wrap: wrap;">
+            <p style="color: #666; text-align: center;">Loading match data...</p>
+        </div>
+    </div>
+    
+    <!-- Prediction CTA -->
+    <div style="background: linear-gradient(135deg, #f5d0fe, #ede9fe); padding: 35px 40px; text-align: center; border-top: 3px solid #da77ed;">
+        <h4 style="color: #7c3aed; margin: 0 0 25px; font-size: 24px; font-weight: 800;">✨ Make Your Prediction ✨</h4>
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 25px;">
+            <select id="predictionWinner" style="padding: 16px 28px; border-radius: 14px; border: 3px solid #c084fc; font-size: 15px; min-width: 220px; background: white; color: #7c3aed; font-weight: 600;">
+                <option value="">🏆 Select Winner</option>
+            </select>
+            <select id="predictionToss" style="padding: 16px 28px; border-radius: 14px; border: 3px solid #f472b6; font-size: 15px; min-width: 220px; background: white; color: #ec4899; font-weight: 600;">
+                <option value="">🪙 Select Toss</option>
+            </select>
+            <select id="predictionBatFirst" style="padding: 16px 28px; border-radius: 14px; border: 3px solid #9333ea; font-size: 15px; min-width: 220px; background: white; color: #7c3aed; font-weight: 600;">
+                <option value="">🏏 Select Batting</option>
+            </select>
+        </div>
+        <button onclick="submitTodayPrediction()" style="background: linear-gradient(135deg, #ec4899, #9333ea); color: white; border: none; padding: 18px 55px; border-radius: 35px; font-size: 18px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 30px rgba(236, 72, 153, 0.5);">
+            🎯 Submit Prediction
+        </button>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
+    <div style="background: linear-gradient(135deg, #ec4899, #f472b6); border-radius: 20px; padding: 28px; text-align: center; box-shadow: 0 15px 40px rgba(236, 72, 153, 0.4);">
+        <div style="color: white; font-size: 36px; font-weight: 900;">🏆</div>
+        <div style="color: white; font-size: 32px; font-weight: 900; margin: 10px 0 5px;">2,450</div>
+        <div style="color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 600;">Predictions</div>
+    </div>
+    <div style="background: linear-gradient(135deg, #9333ea, #c084fc); border-radius: 20px; padding: 28px; text-align: center; box-shadow: 0 15px 40px rgba(147, 51, 234, 0.4);">
+        <div style="color: white; font-size: 36px; font-weight: 900;">🎯</div>
+        <div style="color: white; font-size: 32px; font-weight: 900; margin: 10px 0 5px;">68%</div>
+        <div style="color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 600;">Accuracy</div>
+    </div>
+    <div style="background: linear-gradient(135deg, #7c3aed, #a855f7); border-radius: 20px; padding: 28px; text-align: center; box-shadow: 0 15px 40px rgba(124, 58, 237, 0.4);">
+        <div style="color: white; font-size: 36px; font-weight: 900;">👥</div>
+        <div style="color: white; font-size: 32px; font-weight: 900; margin: 10px 0 5px;">1,250</div>
+        <div style="color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 600;">Users</div>
+    </div>
+    <div style="background: linear-gradient(135deg, #db2777, #f472b6); border-radius: 20px; padding: 28px; text-align: center; box-shadow: 0 15px 40px rgba(219, 39, 119, 0.4);">
+        <div style="color: white; font-size: 36px; font-weight: 900;">🎁</div>
+        <div style="color: white; font-size: 32px; font-weight: 900; margin: 10px 0 5px;">₹50K</div>
+        <div style="color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 600;">Prize Pool</div>
+    </div>
+</div>
+
+<style>
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+</style>
+
+<script>
+    const teamLogos = {
+        'Royal Challengers Bangalore': 'RCB', 'Kolkata Knight Riders': 'KKR',
+        'Gujarat Titans': 'GT', 'Sunrisers Hyderabad': 'SRH',
+        'Delhi Capitals': 'DC', 'Mumbai Indians': 'MI',
+        'Punjab Kings': 'PBKS', 'Chennai Super Kings': 'CSK',
+        'Rajasthan Royals': 'RR', 'Lucknow Super Giants': 'LSG'
+    };
+    
+    const teamColors = {
+        'RCB': '#d92b2b', 'KKR': '#3c2253', 'GT': '#1e1e2e', 'SRH': '#e43c40',
+        'DC': '#17449b', 'MI': '#004ba0', 'PBKS': '#ed1c24', 'CSK': '#fdb913',
+        'RR': '#c83830', 'LSG': '#0f1731'
+    };
+
+    async function loadTodayMatch() {
+        try {
+            const response = await fetch(`${API_BASE}/matches/live`);
+            if (!response.ok) throw new Error('Failed to fetch');
+            
+            const jsonp = await response.text();
+            const start = jsonp.indexOf('{');
+            const end = jsonp.lastIndexOf('}');
+            const json = jsonp.substring(start, end + 1);
+            const data = JSON.parse(json);
+            const matches = data.Matchsummary || [];
+            
+            const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+            let match = matches.find(m => m.MatchDate === today);
+            
+            if (!match) {
+                const upcoming = matches.filter(m => m.MatchDate >= today).sort((a, b) => a.MatchDate.localeCompare(b.MatchDate));
+                match = upcoming[0];
+            }
+            
+            if (match) {
+                const t1 = teamLogos[match.FirstBattingTeamName] || match.FirstBattingTeamName.substring(0,3);
+                const t2 = teamLogos[match.SecondBattingTeamName] || match.SecondBattingTeamName.substring(0,3);
+                const c1 = teamColors[t1] || '#9333ea';
+                const c2 = teamColors[t2] || '#ec4899';
+                
+                document.getElementById('todayMatchContent').innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid ${c1}; background: white; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 36px; font-weight: bold; color: ${c1};">${t1}</span>
+                        </div>
+                        <h4 style="color: #333; font-size: 18px;">${match.FirstBattingTeamName}</h4>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ec4899); display: flex; align-items: center; justify-content: center;">
+                            <span style="color: white; font-size: 28px; font-weight: 900;">VS</span>
+                        </div>
+                        <div style="color: #666; font-size: 18px; font-weight: 600; margin-top: 15px;">${match.MatchTime}</div>
+                        <div style="color: #9333ea; font-size: 14px;">${match.GroundName}</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid ${c2}; background: white; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 36px; font-weight: bold; color: ${c2};">${t2}</span>
+                        </div>
+                        <h4 style="color: #333; font-size: 18px;">${match.SecondBattingTeamName}</h4>
+                    </div>
+                `;
+                
+                const winner = document.getElementById('predictionWinner');
+                const toss = document.getElementById('predictionToss');
+                const bat = document.getElementById('predictionBatFirst');
+                
+                [winner, toss, bat].forEach(select => {
+                    select.innerHTML = `<option value="">Select Team</option>`;
+                    select.innerHTML += `<option value="${match.FirstBattingTeamName}">${match.FirstBattingTeamName}</option>`;
+                    select.innerHTML += `<option value="${match.SecondBattingTeamName}">${match.SecondBattingTeamName}</option>`;
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function submitTodayPrediction() {
+        if (!currentUser) {
+            alert('Please login to submit prediction');
+            openLoginModal();
+            return;
+        }
+        alert('Prediction submitted! 🎉');
+    }
+</script>
