@@ -287,7 +287,11 @@ async function logout() {
     }
 
     currentUser = null;
-    window.location.href = '/';
+    updateUserUI(null);
+    closeLoginModal();
+    closeRegisterModal();
+    openLoginModal();
+    alert("Logged out successfully");
 }
 
 // ---------------- PREDICTION ----------------

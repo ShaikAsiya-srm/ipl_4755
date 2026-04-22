@@ -747,7 +747,7 @@
             
             <div class="user-profile-chip">
                 <span class="user-name">IPLFan</span>
-                <div class="logout-circle" onclick="window.location.href='/'" title="Logout">⏻</div>
+                <div class="logout-circle" onclick="handleLogout()" title="Logout">⏻</div>
             </div>
         </div>
     </nav>
@@ -1492,6 +1492,20 @@
 
         function startAutoSlide() {
             slideInterval = setInterval(showSlides, 5000);
+        }
+
+        async function handleLogout() {
+            try {
+                await fetch(`${API_BASE}/auth`, {
+                    method: "DELETE",
+                    credentials: "include"
+                });
+            } catch (e) {
+                console.error("Logout error:", e);
+            }
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
         }
 
         async function syncData() {
