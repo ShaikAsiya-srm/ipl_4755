@@ -47,26 +47,61 @@
 
     <!-- Predict & Win Card -->
     <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); border-radius: 20px; padding: 30px; box-shadow: 0 15px 50px rgba(30, 27, 75, 0.3); color: white;">
-        <h3 style="color: white; margin: 0 0 15px; font-size: 22px; font-weight: 800;">🎯 Predict & Win</h3>
-        <p style="opacity: 0.8; font-size: 14px; margin-bottom: 20px;">Predict match outcomes and earn 10 points to climb the leaderboard!</p>
+        <h3 style="color: white; margin: 0 0 10px; font-size: 22px; font-weight: 800;">🎯 Predict & Win</h3>
+        <p style="opacity: 0.8; font-size: 14px; margin-bottom: 20px;">Answer all questions correctly to earn maximum points!</p>
         
-        <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
             <select id="predMatchSelect" onchange="updatePredictionTeams()" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
                 <option value="" style="color: black;">Select a Match</option>
             </select>
             
-            <select id="predTossWinner" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+            <select id="predWinner" onchange="updatePotentialPoints()" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+                <option value="" style="color: black;">Who will win the match?</option>
+            </select>
+            
+            <select id="predTossWinner" onchange="updatePotentialPoints()" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
                 <option value="" style="color: black;">Who will win the toss?</option>
             </select>
             
-            <select id="predBatFirst" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+            <select id="predBatFirst" onchange="updatePotentialPoints()" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
                 <option value="" style="color: black;">Who will bat first?</option>
             </select>
             
-            <input type="text" id="predPlayer" placeholder="Man of the Match Player" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+            <input type="text" id="predPlayer" oninput="updatePotentialPoints()" placeholder="Man of the Match Player" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+            
+            <input type="text" id="predTopScorer" oninput="updatePotentialPoints()" placeholder="Top Run Scorer (Player Name)" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+            
+            <input type="text" id="predTopBowler" oninput="updatePotentialPoints()" placeholder="Top Wicket Taker (Player Name)" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+            
+            <select id="predTotalSixes" onchange="updatePotentialPoints()" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+                <option value="" style="color: black;">Total Sixes in Match</option>
+                <option value="0-10" style="color: black;">0-10</option>
+                <option value="11-20" style="color: black;">11-20</option>
+                <option value="21-30" style="color: black;">21-30</option>
+                <option value="30+" style="color: black;">30+</option>
+            </select>
+            
+            <select id="predTotalRuns" onchange="updatePotentialPoints()" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+                <option value="" style="color: black;">Total Runs (Both Teams)</option>
+                <option value="200-250" style="color: black;">200-250</option>
+                <option value="251-300" style="color: black;">251-300</option>
+                <option value="301-350" style="color: black;">301-350</option>
+                <option value="350+" style="color: black;">350+</option>
+            </select>
+            
+            <select id="predMatchWinner" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px; display: none;">
+                <option value="" style="color: black;">Match Winner</option>
+            </select>
         </div>
         
-        <button onclick="submitPrediction()" style="width: 100%; background: #facc15; color: #1e1b4b; border: none; padding: 15px; border-radius: 12px; margin-top: 15px; font-weight: 800; cursor: pointer;">Submit Prediction (+10 Pts)</button>
+        <div style="background: rgba(250, 204, 21, 0.15); padding: 12px; border-radius: 10px; margin-top: 15px; border: 1px solid rgba(250, 204, 21, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 13px; font-weight: 700;">Potential Points:</span>
+                <span id="potentialPoints" style="color: #facc15; font-size: 18px; font-weight: 900;">0 pts</span>
+            </div>
+        </div>
+        
+        <button onclick="submitPrediction()" style="width: 100%; background: linear-gradient(135deg, #facc15, #eab308); color: #1e1b4b; border: none; padding: 16px; border-radius: 12px; margin-top: 15px; font-weight: 800; cursor: pointer; font-size: 16px; box-shadow: 0 8px 20px rgba(250, 204, 21, 0.3);">🚀 Submit All Predictions</button>
     </div>
 </div>
 
@@ -147,9 +182,11 @@
         const matchId = select.value;
         const tossSelect = document.getElementById('predTossWinner');
         const batSelect = document.getElementById('predBatFirst');
+        const winnerSelect = document.getElementById('predWinner');
         
         tossSelect.innerHTML = '<option value="" style="color: black;">Who will win the toss?</option>';
         batSelect.innerHTML = '<option value="" style="color: black;">Who will bat first?</option>';
+        winnerSelect.innerHTML = '<option value="" style="color: black;">Who will win the match?</option>';
         
         if (matchId) {
             const match = dbMatches.find(m => m.id == matchId);
@@ -166,19 +203,47 @@
                     bOpt.style.color = "black";
                     bOpt.textContent = team;
                     batSelect.appendChild(bOpt);
+                    
+                    const wOpt = document.createElement('option');
+                    wOpt.value = team;
+                    wOpt.style.color = "black";
+                    wOpt.textContent = team;
+                    winnerSelect.appendChild(wOpt);
                 });
             }
         }
+        updatePotentialPoints();
+    }
+
+    function updatePotentialPoints() {
+        const fields = [
+            'predMatchSelect', 'predWinner', 'predTossWinner', 
+            'predBatFirst', 'predPlayer', 'predTopScorer', 
+            'predTopBowler', 'predTotalSixes', 'predTotalRuns'
+        ];
+        let filled = 0;
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.value) filled++;
+        });
+        const points = filled * 10;
+        const ptsEl = document.getElementById('potentialPoints');
+        if (ptsEl) ptsEl.textContent = points + ' pts';
     }
 
     async function submitPrediction() {
         const matchId = document.getElementById('predMatchSelect').value;
+        const winner = document.getElementById('predWinner').value;
         const tossWinner = document.getElementById('predTossWinner').value;
         const batFirst = document.getElementById('predBatFirst').value;
         const player = document.getElementById('predPlayer').value;
+        const topScorer = document.getElementById('predTopScorer').value;
+        const topBowler = document.getElementById('predTopBowler').value;
+        const totalSixes = document.getElementById('predTotalSixes').value;
+        const totalRuns = document.getElementById('predTotalRuns').value;
         
-        if (!matchId || !tossWinner || !batFirst || !player) {
-            alert('Please fill in all prediction fields!');
+        if (!matchId || !winner || !tossWinner || !batFirst || !player) {
+            alert('Please fill in all required prediction fields!');
             return;
         }
 
@@ -195,9 +260,14 @@
         const prediction = {
             userId: userId,
             matchId: parseInt(matchId),
+            winner: winner,
             tossWinner: tossWinner,
             batFirst: batFirst,
-            player: player
+            player: player,
+            topScorer: topScorer,
+            topBowler: topBowler,
+            totalSixes: totalSixes,
+            totalRuns: totalRuns
         };
 
         try {
@@ -210,14 +280,18 @@
             });
 
             if (response.ok) {
-                alert('Prediction submitted successfully! You earned 10 points.');
+                alert('🎉 All predictions submitted successfully! You earned points for each correct prediction.');
                 // Clear form
                 document.getElementById('predMatchSelect').value = '';
+                document.getElementById('predWinner').innerHTML = '<option value="" style="color: black;">Who will win the match?</option>';
                 document.getElementById('predTossWinner').innerHTML = '<option value="" style="color: black;">Who will win the toss?</option>';
                 document.getElementById('predBatFirst').innerHTML = '<option value="" style="color: black;">Who will bat first?</option>';
                 document.getElementById('predPlayer').value = '';
-                
-                // If leaderboard is loaded in the page, it should reflect the new score next time it loads
+                document.getElementById('predTopScorer').value = '';
+                document.getElementById('predTopBowler').value = '';
+                document.getElementById('predTotalSixes').value = '';
+                document.getElementById('predTotalRuns').value = '';
+                updatePotentialPoints();
             } else {
                 throw new Error('Submission failed');
             }
