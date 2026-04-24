@@ -136,6 +136,27 @@
     </div>
 </div>
 
+<!-- Full Match List (Season Schedule) -->
+<div style="background: white; border-radius: 20px; padding: 35px; box-shadow: 0 15px 50px rgba(0,0,0,0.05); margin-bottom: 40px;">
+    <h3 style="color: #1e293b; margin: 0 0 25px; font-size: 26px; font-weight: 900; text-align: center;">📅 Season Schedule</h3>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                    <th style="padding: 18px; text-align: left; color: #64748b; font-weight: 800;">Date</th>
+                    <th style="padding: 18px; text-align: center; color: #64748b; font-weight: 800;">Match</th>
+                    <th style="padding: 18px; text-align: left; color: #64748b; font-weight: 800;">Venue</th>
+                    <th style="padding: 18px; text-align: center; color: #64748b; font-weight: 800;">Status</th>
+                    <th style="padding: 18px; text-align: center; color: #64748b; font-weight: 800;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="matchList">
+                <!-- Data populated via script -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <style>
     @keyframes pulse {
         0%, 100% { opacity: 1; }

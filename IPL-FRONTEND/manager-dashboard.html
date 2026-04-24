@@ -776,6 +776,26 @@
                 <!-- Loaded via JS -->
             </div>
         </div>
+
+        <!-- Full Match List (Season Fixtures) -->
+        <div style="background: white; border-radius: 20px; padding: 35px; box-shadow: 0 15px 50px rgba(0,0,0,0.05); margin-top: 40px; margin-bottom: 40px; color: #1e293b; margin-left: 4rem; margin-right: 4rem;">
+            <h3 style="color: #1e293b; margin: 0 0 25px; font-size: 26px; font-weight: 900; text-align: center;">📅 Season Fixtures</h3>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                            <th style="padding: 18px; text-align: left; color: #64748b; font-weight: 800;">Date</th>
+                            <th style="padding: 18px; text-align: center; color: #64748b; font-weight: 800;">Match</th>
+                            <th style="padding: 18px; text-align: left; color: #64748b; font-weight: 800;">Venue</th>
+                            <th style="padding: 18px; text-align: left; color: #64748b; font-weight: 800;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matchList">
+                        <!-- Data populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- Leaderboard and Match sections hidden for brevity but logic remains -->
@@ -824,26 +844,6 @@
                 </div>
 
                 <button class="main-cta-btn" onclick="submitUserPrediction()" style="width: 100%; background: #facc15; color: #1e1b4b; font-weight: 900; box-shadow: 0 10px 20px rgba(250, 204, 21, 0.2);">SUBMIT PREDICTION</button>
-            </div>
-        </div>
-
-        <!-- Full Match List -->
-        <div style="background: white; border-radius: 20px; padding: 35px; box-shadow: 0 15px 50px rgba(0,0,0,0.05);">
-            <h3 style="color: #1e293b; margin: 0 0 25px; font-size: 26px; font-weight: 900; text-align: center;">📅 Season Fixtures</h3>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                            <th style="padding: 18px; text-align: left; color: #64748b; font-weight: 800;">Date</th>
-                            <th style="padding: 18px; text-align: center; color: #64748b; font-weight: 800;">Match</th>
-                            <th style="padding: 18px; text-align: left; color: #64748b; font-weight: 800;">Venue</th>
-                            <th style="padding: 18px; text-align: left; color: #64748b; font-weight: 800;">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="matchList">
-                        <!-- Data populated via JS -->
-                    </tbody>
-                </table>
             </div>
         </div>
 

@@ -12,24 +12,46 @@ import java.util.List;
 public class PredictionService {
 
     public Prediction createPrediction(Prediction prediction) throws Exception {
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO predictions (user_id, match_id, toss_winner, bat_first, player) VALUES (?, ?, ?, ?, ?)",
-                     Statement.RETURN_GENERATED_KEYS)) {
-
-            stmt.setLong(1, prediction.getUserId());
-            stmt.setLong(2, prediction.getMatchId());
-            stmt.setString(3, prediction.getTossWinner());
-            stmt.setString(4, prediction.getBatFirst());
-            stmt.setString(5, prediction.getPlayer());
-            stmt.executeUpdate();
-
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                prediction.setId(rs.getLong(1));
-                return prediction;
+        try (Connection conn = DBConnection.getConnection()) {
+            
+            // Create predictions table if it doesn't exist
+            try (Statement createStmt = conn.createStatement()) {
+                createStmt.execute("CREATE TABLE IF NOT EXISTS predictions (" +
+                        "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                        "user_id BIGINT NOT NULL, " +
+                        "match_id BIGINT NOT NULL, " +
+                        "toss_winner VARCHAR(50), " +
+                        "bat_first VARCHAR(50), " +
+                        "player VARCHAR(100), " +
+                        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
             }
-            throw new Exception("Failed to create prediction");
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO predictions (user_id, match_id, toss_winner, bat_first, player) VALUES (?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS)) {
+
+                stmt.setLong(1, prediction.getUserId());
+                stmt.setLong(2, prediction.getMatchId());
+                stmt.setString(3, prediction.getTossWinner());
+                stmt.setString(4, prediction.getBatFirst());
+                stmt.setString(5, prediction.getPlayer());
+                stmt.executeUpdate();
+
+                ResultSet rs = stmt.getGeneratedKeys();
+                if (rs.next()) {
+                    prediction.setId(rs.getLong(1));
+                    
+                    // Award 10 points for participating
+                    try (PreparedStatement updateStmt = conn.prepareStatement(
+                            "UPDATE users SET score = score + 10 WHERE id = ?")) {
+                        updateStmt.setLong(1, prediction.getUserId());
+                        updateStmt.executeUpdate();
+                    }
+                    
+                    return prediction;
+                }
+                throw new Exception("Failed to create prediction");
+            }
         } catch (SQLException e) {
             throw new Exception("Database error: " + e.getMessage());
         }

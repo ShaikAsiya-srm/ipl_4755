@@ -48,12 +48,25 @@
     <!-- Predict & Win Card -->
     <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); border-radius: 20px; padding: 30px; box-shadow: 0 15px 50px rgba(30, 27, 75, 0.3); color: white;">
         <h3 style="color: white; margin: 0 0 15px; font-size: 22px; font-weight: 800;">🎯 Predict & Win</h3>
-        <p style="opacity: 0.8; font-size: 14px; margin-bottom: 25px;">Who will win the next clash? Make your choice and climb the leaderboard!</p>
-        <div style="display: flex; gap: 15px;">
-            <button style="flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 15px; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; transition: 0.3s;">RCB</button>
-            <button style="flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 15px; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; transition: 0.3s;">KKR</button>
+        <p style="opacity: 0.8; font-size: 14px; margin-bottom: 20px;">Predict match outcomes and earn 10 points to climb the leaderboard!</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <select id="predMatchSelect" onchange="updatePredictionTeams()" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+                <option value="" style="color: black;">Select a Match</option>
+            </select>
+            
+            <select id="predTossWinner" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+                <option value="" style="color: black;">Who will win the toss?</option>
+            </select>
+            
+            <select id="predBatFirst" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
+                <option value="" style="color: black;">Who will bat first?</option>
+            </select>
+            
+            <input type="text" id="predPlayer" placeholder="Man of the Match Player" style="width: 100%; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px;">
         </div>
-        <button style="width: 100%; background: #facc15; color: #1e1b4b; border: none; padding: 15px; border-radius: 12px; margin-top: 15px; font-weight: 800; cursor: pointer;">Submit Prediction</button>
+        
+        <button onclick="submitPrediction()" style="width: 100%; background: #facc15; color: #1e1b4b; border: none; padding: 15px; border-radius: 12px; margin-top: 15px; font-weight: 800; cursor: pointer;">Submit Prediction (+10 Pts)</button>
     </div>
 </div>
 
@@ -80,26 +93,7 @@
     </div>
 </div>
 
-<!-- Full Match List (Missing Fix) -->
-<div style="background: white; border-radius: 20px; padding: 35px; box-shadow: 0 15px 50px rgba(0,0,0,0.05);">
-    <h3 style="color: #1e293b; margin: 0 0 25px; font-size: 26px; font-weight: 900; text-align: center;">📅 Season Schedule</h3>
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                    <th style="padding: 18px; text-align: left; color: #64748b; font-weight: 800;">Date</th>
-                    <th style="padding: 18px; text-align: center; color: #64748b; font-weight: 800;">Match</th>
-                    <th style="padding: 18px; text-align: left; color: #64748b; font-weight: 800;">Venue</th>
-                    <th style="padding: 18px; text-align: center; color: #64748b; font-weight: 800;">Status</th>
-                    <th style="padding: 18px; text-align: center; color: #64748b; font-weight: 800;">Action</th>
-                </tr>
-            </thead>
-            <tbody id="matchList">
-                <!-- Data populated via script -->
-            </tbody>
-        </table>
-    </div>
-</div>
+
 
 <script>
     // Matches Module Functions
@@ -122,96 +116,114 @@
         'RR': '#c83830', 'LSG': '#0f1731'
     };
 
-    async function loadMatches() {
+
+
+    // Store loaded matches for prediction form
+    let dbMatches = [];
+
+    async function loadMatchesForPrediction() {
         try {
-            const response = await fetch(`${API_BASE}/matches/live`);
-            if (!response.ok) throw new Error('Failed to fetch feed');
-            
-            const jsonp = await response.text();
-            const start = jsonp.indexOf('{');
-            const end = jsonp.lastIndexOf('}');
-            if (start === -1 || end === -1) throw new Error('Invalid feed format');
-            const json = jsonp.substring(start, end + 1);
-            const data = JSON.parse(json);
-            const matches = (data.Matchsummary || []).map(m => ({
-                team1: m.FirstBattingTeamName,
-                team2: m.SecondBattingTeamName,
-                stadium: m.GroundName,
-                time: m.MatchTime,
-                date: m.MatchDate,
-                status: m.MatchStatus || 'Scheduled'
-            }));
-            
-            matches.sort((a, b) => a.date.localeCompare(b.date));
-            renderMatches(matches);
+            const response = await fetch(`${API_BASE}/matches`);
+            if (response.ok) {
+                dbMatches = await response.json();
+                const select = document.getElementById('predMatchSelect');
+                select.innerHTML = '<option value="" style="color: black;">Select a Match</option>';
+                
+                dbMatches.forEach(match => {
+                    const option = document.createElement('option');
+                    option.value = match.id;
+                    option.style.color = "black";
+                    option.textContent = `${match.team1} vs ${match.team2} (${match.date || 'TBD'})`;
+                    select.appendChild(option);
+                });
+            }
         } catch (error) {
-            console.error('Error loading matches:', error);
-            document.getElementById('matchList').innerHTML = '<tr><td colspan="5" style="color:red;text-align:center;">Error loading data</td></tr>';
+            console.error('Error loading matches for prediction:', error);
         }
     }
 
-    function renderMatches(matches) {
-        const matchList = document.getElementById('matchList');
-        if (!matchList) return;
-        matchList.innerHTML = '';
+    function updatePredictionTeams() {
+        const select = document.getElementById('predMatchSelect');
+        const matchId = select.value;
+        const tossSelect = document.getElementById('predTossWinner');
+        const batSelect = document.getElementById('predBatFirst');
         
-        matches.forEach((match, idx) => {
-            const date = new Date(match.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const t1Logo = teamLogos[match.team1] || match.team1.substring(0,3).toUpperCase();
-            const t2Logo = teamLogos[match.team2] || match.team2.substring(0,3).toUpperCase();
-            const t1Color = teamColors[t1Logo] || '#9333ea';
-            const t2Color = teamColors[t2Logo] || '#ec4899';
-            
-            let statusBadge = '';
-            if (match.status === 'Live') {
-                statusBadge = '<span style="background:#ef4444;color:white;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;background:white;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;"></span>LIVE</span>';
-            } else if (match.status === 'Completed') {
-                statusBadge = '<span style="background:#22c55e;color:white;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:800;">COMPLETED</span>';
-            } else {
-                const matchDate = new Date(match.date);
-                const formattedDate = matchDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                statusBadge = `<span style="background:#f1f5f9;color:#64748b;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:800;">${formattedDate} • ${match.time}</span>`;
+        tossSelect.innerHTML = '<option value="" style="color: black;">Who will win the toss?</option>';
+        batSelect.innerHTML = '<option value="" style="color: black;">Who will bat first?</option>';
+        
+        if (matchId) {
+            const match = dbMatches.find(m => m.id == matchId);
+            if (match) {
+                [match.team1, match.team2].forEach(team => {
+                    const tOpt = document.createElement('option');
+                    tOpt.value = team;
+                    tOpt.style.color = "black";
+                    tOpt.textContent = team;
+                    tossSelect.appendChild(tOpt);
+                    
+                    const bOpt = document.createElement('option');
+                    bOpt.value = team;
+                    bOpt.style.color = "black";
+                    bOpt.textContent = team;
+                    batSelect.appendChild(bOpt);
+                });
             }
-
-            const row = document.createElement('tr');
-            row.style.borderBottom = '1px solid #f1f5f9';
-            row.innerHTML = `
-                <td style="font-weight:600;color:#64748b;padding:20px;">${date}</td>
-                <td style="padding:20px;">
-                    <div style="display:flex;align-items:center;justify-content:center;gap:12px;">
-                        <span style="width:35px;height:35px;border-radius:50%;background:${t1Color};display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;">${t1Logo}</span>
-                        <span style="font-weight:800;color:#1e293b;font-size:14px;">VS</span>
-                        <span style="width:35px;height:35px;border-radius:50%;background:${t2Color};display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;">${t2Logo}</span>
-                    </div>
-                </td>
-                <td style="color:#64748b;padding:20px;font-weight:600;">${match.stadium}</td>
-                <td style="padding:20px;text-align:center;">${statusBadge}</td>
-                <td style="padding:20px;text-align:center;">
-                    <button onclick="deleteMatch('${match.date}', '${match.team1}', '${match.team2}')" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Delete</button>
-                </td>
-            `;
-            matchList.appendChild(row);
-        });
+        }
     }
 
-    async function deleteMatch(date, team1, team2) {
-        if (!confirm(`Delete match: ${team1} vs ${team2} on ${date}?`)) return;
+    async function submitPrediction() {
+        const matchId = document.getElementById('predMatchSelect').value;
+        const tossWinner = document.getElementById('predTossWinner').value;
+        const batFirst = document.getElementById('predBatFirst').value;
+        const player = document.getElementById('predPlayer').value;
         
+        if (!matchId || !tossWinner || !batFirst || !player) {
+            alert('Please fill in all prediction fields!');
+            return;
+        }
+
+        // Use logged in user if available, otherwise fallback to 1
+        let userId = 1; 
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                userId = user.id || 1;
+            } catch (e) {}
+        }
+
+        const prediction = {
+            userId: userId,
+            matchId: parseInt(matchId),
+            tossWinner: tossWinner,
+            batFirst: batFirst,
+            player: player
+        };
+
         try {
-            const matchKey = `${date}-${team1}-${team2}`.replace(/\s+/g, '-');
-            const response = await fetch(`${API_BASE}/matches/delete/${encodeURIComponent(matchKey)}`, {
-                method: 'DELETE'
+            const response = await fetch(`${API_BASE}/predictions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(prediction)
             });
-            
+
             if (response.ok) {
-                alert('Match deleted successfully!');
-                loadMatches();
+                alert('Prediction submitted successfully! You earned 10 points.');
+                // Clear form
+                document.getElementById('predMatchSelect').value = '';
+                document.getElementById('predTossWinner').innerHTML = '<option value="" style="color: black;">Who will win the toss?</option>';
+                document.getElementById('predBatFirst').innerHTML = '<option value="" style="color: black;">Who will bat first?</option>';
+                document.getElementById('predPlayer').value = '';
+                
+                // If leaderboard is loaded in the page, it should reflect the new score next time it loads
             } else {
-                throw new Error('Delete failed');
+                throw new Error('Submission failed');
             }
         } catch (error) {
-            console.error('Delete error:', error);
-            alert('Failed to delete match');
+            console.error('Prediction error:', error);
+            alert('Failed to submit prediction');
         }
     }
 
@@ -227,5 +239,6 @@
     document.head.appendChild(style);
 
     // Initial Load
-    loadMatches();
+
+    loadMatchesForPrediction();
 </script>
