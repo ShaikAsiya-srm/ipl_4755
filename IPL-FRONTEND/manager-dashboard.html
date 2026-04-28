@@ -866,33 +866,8 @@
     <!-- Leaderboard Section -->
     <div id="leaderboard" class="page-module" style="padding: 6rem 4rem;">
         <!-- Podium Section -->
-        <div style="display: flex; justify-content: center; align-items: flex-end; gap: 30px; margin-bottom: 70px;">
-            <!-- 2nd Place -->
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 28px; padding: 35px 25px; text-align: center; width: 230px; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: 0.4s;">
-                <div style="font-size: 45px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(192,192,192,0.4));">🥈</div>
-                <div style="width: 75px; height: 75px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #4f46e5); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-weight: 800; font-size: 26px; border: 3px solid rgba(255,255,255,0.1); color: white;">AK</div>
-                <div style="font-weight: 800; font-size: 20px; color: white; letter-spacing: -0.5px;">AkashKing</div>
-                <div style="color: #a5b4fc; font-size: 26px; font-weight: 900; margin: 12px 0;">2,180</div>
-                <div style="background: rgba(99, 102, 241, 0.2); padding: 5px 12px; color: #c7d2fe; font-size: 12px; font-weight: 700; display: inline-block;">72% Accuracy</div>
-            </div>
-            
-            <!-- 1st Place -->
-            <div style="background: linear-gradient(135deg, rgba(250, 204, 21, 0.15), rgba(250, 204, 21, 0.05)); border: 2px solid rgba(250, 204, 21, 0.4); border-radius: 32px; padding: 50px 35px; text-align: center; width: 280px; transform: scale(1.1); box-shadow: 0 25px 60px rgba(250, 204, 21, 0.2); backdrop-filter: blur(20px); z-index: 10; transition: 0.4s;">
-                <div style="font-size: 60px; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(250,204,21,0.5));">🥇</div>
-                <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #facc15, #eab308); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-weight: 900; font-size: 36px; color: #1e1b4b; border: 4px solid rgba(255,255,255,0.2); box-shadow: 0 15px 35px rgba(250, 204, 21, 0.4);">CR</div>
-                <div style="font-weight: 900; font-size: 24px; color: white; letter-spacing: -0.5px;">CricketRoy</div>
-                <div style="color: #facc15; font-size: 36px; font-weight: 900; margin: 12px 0;">2,450</div>
-                <div style="background: rgba(34, 197, 94, 0.2); padding: 6px 15px; color: #4ade80; font-size: 14px; font-weight: 800; display: inline-block;">85% Accuracy</div>
-            </div>
-            
-            <!-- 3rd Place -->
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 28px; padding: 35px 25px; text-align: center; width: 230px; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: 0.4s;">
-                <div style="font-size: 45px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(180,83,9,0.4));">🥉</div>
-                <div style="width: 75px; height: 75px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-weight: 800; font-size: 26px; border: 3px solid rgba(255,255,255,0.1); color: white;">VP</div>
-                <div style="font-weight: 800; font-size: 20px; color: white; letter-spacing: -0.5px;">VickyPro</div>
-                <div style="color: #6ee7b7; font-size: 26px; font-weight: 900; margin: 12px 0;">2,120</div>
-                <div style="background: rgba(16, 185, 129, 0.2); padding: 5px 12px; color: #6ee7b7; font-size: 12px; font-weight: 700; display: inline-block;">68% Accuracy</div>
-            </div>
+        <div id="podiumSection" style="display: flex; justify-content: center; align-items: flex-end; gap: 30px; margin-bottom: 70px;">
+            <!-- Dynamatically populated top 3 -->
         </div>
 
         <!-- User Stats Grid -->
@@ -1403,9 +1378,107 @@
                         </td>
                     </tr>
                 `).join('');
+
+                // Also update podium section
+                renderPodium(users.slice(0, 3));
             } catch (e) {
                 list.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#ff4d6d; padding:40px;">Leaderboard fetch failed.</td></tr>';
             }
+        }
+
+        function renderPodium(top3) {
+            const container = document.getElementById('podiumSection');
+            if (!container || !top3 || top3.length === 0) return;
+
+            // Order: 2nd, 1st, 3rd for visual centering
+            const order = top3.length === 3 ? [1, 0, 2] : [0, 1, 2]; // indices
+            
+            container.innerHTML = '';
+            
+            order.forEach((idx, visualIdx) => {
+                const user = top3[idx];
+                if (!user) return;
+
+                const rank = idx + 1;
+                const isFirst = rank === 1;
+                
+                const initials = user.username.substring(0, 2).toUpperCase();
+                
+                const styles = {
+                    1: { // 1st
+                        bg: 'linear-gradient(135deg, rgba(250, 204, 21, 0.15), rgba(250, 204, 21, 0.05))',
+                        border: '2px solid rgba(250, 204, 21, 0.4)',
+                        avatarBg: 'linear-gradient(135deg, #facc15, #eab308)',
+                        avatarColor: '#1e1b4b',
+                        ptsColor: '#facc15',
+                        transform: 'scale(1.1)',
+                        medal: '🥇',
+                        medalSize: '60px',
+                        avatarSize: '100px',
+                        avatarFontSize: '36px',
+                        nameSize: '24px',
+                        ptsSize: '36px',
+                        zIndex: 10,
+                        boxShadow: '0 25px 60px rgba(250, 204, 21, 0.2)',
+                        accuracyBg: 'rgba(34, 197, 94, 0.2)',
+                        accuracyColor: '#4ade80'
+                    },
+                    2: { // 2nd
+                        bg: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        avatarBg: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                        avatarColor: 'white',
+                        ptsColor: '#a5b4fc',
+                        transform: 'scale(1)',
+                        medal: '🥈',
+                        medalSize: '45px',
+                        avatarSize: '75px',
+                        avatarFontSize: '26px',
+                        nameSize: '20px',
+                        ptsSize: '26px',
+                        zIndex: 1,
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                        accuracyBg: 'rgba(99, 102, 241, 0.2)',
+                        accuracyColor: '#c7d2fe'
+                    },
+                    3: { // 3rd
+                        bg: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        avatarBg: 'linear-gradient(135deg, #10b981, #059669)',
+                        avatarColor: 'white',
+                        ptsColor: '#6ee7b7',
+                        transform: 'scale(1)',
+                        medal: '🥉',
+                        medalSize: '45px',
+                        avatarSize: '75px',
+                        avatarFontSize: '26px',
+                        nameSize: '20px',
+                        ptsSize: '26px',
+                        zIndex: 1,
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                        accuracyBg: 'rgba(16, 185, 129, 0.2)',
+                        accuracyColor: '#6ee7b7'
+                    }
+                };
+                
+                const s = styles[rank];
+                const accuracy = Math.floor(Math.random() * 20) + 65; // Mock
+                
+                const card = document.createElement('div');
+                card.style.cssText = `background: ${s.bg}; border: ${s.border}; border-radius: ${isFirst ? '32px' : '28px'}; padding: ${isFirst ? '50px 35px' : '35px 25px'}; text-align: center; width: ${isFirst ? '280px' : '230px'}; transform: ${s.transform}; box-shadow: ${s.boxShadow}; backdrop-filter: blur(15px); z-index: ${s.zIndex}; transition: 0.4s;`;
+                
+                card.innerHTML = `
+                    <div style="font-size: ${s.medalSize}; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(192,192,192,0.4));">${s.medal}</div>
+                    <div style="width: ${s.avatarSize}; height: ${s.avatarSize}; border-radius: 50%; background: ${s.avatarBg}; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-weight: 800; font-size: ${s.avatarFontSize}; border: ${isFirst ? '4px solid rgba(255,255,255,0.2)' : '3px solid rgba(255,255,255,0.1)'}; color: ${s.avatarColor}; box-shadow: ${isFirst ? '0 15px 35px rgba(250, 204, 21, 0.4)' : 'none'};">
+                        ${initials}
+                    </div>
+                    <div style="font-weight: 800; font-size: ${s.nameSize}; color: white; letter-spacing: -0.5px;">${user.username}</div>
+                    <div style="color: ${s.ptsColor}; font-size: ${s.ptsSize}; font-weight: 900; margin: 12px 0;">${user.score.toLocaleString()}</div>
+                    <div style="${s.accuracyBg}; padding: 5px 12px; color: ${s.accuracyColor}; font-size: 12px; font-weight: 700; display: inline-block;">${accuracy}% Accuracy</div>
+                `;
+                
+                container.appendChild(card);
+            });
         }
 
         function openUserStatsModal(username, score, rank) {

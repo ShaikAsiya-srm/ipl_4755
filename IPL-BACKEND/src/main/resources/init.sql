@@ -28,9 +28,17 @@ CREATE TABLE IF NOT EXISTS predictions (
     toss_winner VARCHAR(50),
     bat_first VARCHAR(50),
     player VARCHAR(100),
+    winner VARCHAR(50),
+    top_scorer VARCHAR(100),
+    top_bowler VARCHAR(100),
+    total_sixes VARCHAR(20),
+    total_runs VARCHAR(20),
+    predicted_team VARCHAR(50),
+    points INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (match_id) REFERENCES matches(id)
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_match FOREIGN KEY (match_id) REFERENCES matches(id),
+    CONSTRAINT unique_user_match UNIQUE (user_id, match_id)
 );
 
 -- Insert sample users (only if not exists)

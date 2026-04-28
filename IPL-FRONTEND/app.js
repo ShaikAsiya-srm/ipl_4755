@@ -1,4 +1,5 @@
-const API_BASE = "http://localhost:8081/ipl-backend/api";
+const BASE_URL = "http://localhost:8081/ipl-backend";
+const API_BASE = `${BASE_URL}/api`;
 
 let currentUser = null;
 let currentMatch = null;
@@ -109,13 +110,12 @@ async function loadToday() {
             }
         }
     } catch (error) {
-        console.warn("Backend unavailable, using fallback data:", error);
+        console.warn("Backend unavailable, cannot load today's match:", error);
     }
     
-    // Use fallback data
-    const todayMatch = FALLBACK_MATCHES[0];
-    currentMatch = todayMatch;
-    renderTodayMatch(todayMatch);
+    // Don't show wrong hardcoded match as "today" if backend is down
+    currentMatch = null;
+    renderTodayMatch(null);
 }
 
 function renderTodayMatch(match) {
@@ -301,16 +301,26 @@ async function submitPrediction() {
         return;
     }
 
-    const toss = document.getElementById("toss").value;
-    const bat = document.getElementById("bat").value;
-    const player = document.getElementById("player").value;
+    const winner = document.getElementById("predictionWinner")?.value;
+    const toss = document.getElementById("predictionToss")?.value;
+    const bat = document.getElementById("predictionBatFirst")?.value;
+
+    if (!winner || !toss || !bat) {
+        alert("Please select winner, toss, and batting first");
+        return;
+    }
 
     const prediction = {
         userId: currentUser.id,
         matchId: currentMatch.id,
         tossWinner: toss,
         batFirst: bat,
-        player: player
+        player: null,
+        winner: winner,
+        topScorer: null,
+        topBowler: null,
+        totalSixes: null,
+        totalRuns: null
     };
 
     try {

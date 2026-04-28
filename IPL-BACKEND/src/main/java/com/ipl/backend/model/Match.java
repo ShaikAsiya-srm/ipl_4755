@@ -13,6 +13,14 @@ public class Match {
     private String score2;
     private String result;
     private Boolean isToday;
+    // Result fields
+    private String actualWinner;
+    private String topScorer;
+    private String topBowler;
+    private String actualTotalSixes;
+    private String actualTotalRuns;
+    private String tossWinner;
+    private String batFirst;
 
     public Match() {}
 
@@ -60,4 +68,25 @@ public class Match {
 
     public Boolean getIsToday() { return isToday; }
     public void setIsToday(Boolean isToday) { this.isToday = isToday; }
+
+    public String getActualWinner() { return actualWinner; }
+    public void setActualWinner(String actualWinner) { this.actualWinner = actualWinner; }
+
+    public String getTopScorer() { return topScorer; }
+    public void setTopScorer(String topScorer) { this.topScorer = topScorer; }
+
+    public String getTopBowler() { return topBowler; }
+    public void setTopBowler(String topBowler) { this.topBowler = topBowler; }
+
+    public String getActualTotalSixes() { return actualTotalSixes; }
+    public void setActualTotalSixes(String actualTotalSixes) { this.actualTotalSixes = actualTotalSixes; }
+
+    public String getActualTotalRuns() { return actualTotalRuns; }
+    public void setActualTotalRuns(String actualTotalRuns) { this.actualTotalRuns = actualTotalRuns; }
+
+    public String getTossWinner() { return tossWinner; }
+    public void setTossWinner(String tossWinner) { this.tossWinner = tossWinner; }
+
+    public String getBatFirst() { return batFirst; }
+    public void setBatFirst(String batFirst) { this.batFirst = batFirst; }
 }

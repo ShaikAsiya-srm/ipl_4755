@@ -7,6 +7,13 @@ public class Prediction {
     private String tossWinner;
     private String batFirst;
     private String player;
+    private String winner;
+    private String topScorer;
+    private String topBowler;
+    private String totalSixes;
+    private String totalRuns;
+    private String predictedTeam;
+    private int points;
 
     public Prediction() {}
 
@@ -36,4 +43,25 @@ public class Prediction {
 
     public String getPlayer() { return player; }
     public void setPlayer(String player) { this.player = player; }
+
+    public String getWinner() { return winner; }
+    public void setWinner(String winner) { this.winner = winner; }
+
+    public String getTopScorer() { return topScorer; }
+    public void setTopScorer(String topScorer) { this.topScorer = topScorer; }
+
+    public String getTopBowler() { return topBowler; }
+    public void setTopBowler(String topBowler) { this.topBowler = topBowler; }
+
+    public String getTotalSixes() { return totalSixes; }
+    public void setTotalSixes(String totalSixes) { this.totalSixes = totalSixes; }
+
+    public String getTotalRuns() { return totalRuns; }
+    public void setTotalRuns(String totalRuns) { this.totalRuns = totalRuns; }
+
+    public String getPredictedTeam() { return predictedTeam; }
+    public void setPredictedTeam(String predictedTeam) { this.predictedTeam = predictedTeam; }
+
+    public int getPoints() { return points; }
+    public void setPoints(int points) { this.points = points; }
 }

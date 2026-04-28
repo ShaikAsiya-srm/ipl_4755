@@ -1,6 +1,6 @@
 package com.ipl.backend.controller;
 
-import com.ipl.backend.model.User;
+import com.ipl.backend.model.LeaderboardDTO;
 import com.ipl.backend.service.LeaderboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/leaderboard")
-@CrossOrigin(origins = "http://localhost:3001")
+@CrossOrigin(origins = {"http://localhost:3001", "http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:8080"})
 public class LeaderboardController {
 
     @Autowired
@@ -22,7 +22,7 @@ public class LeaderboardController {
     @GetMapping
     public ResponseEntity<?> getLeaderboard() {
         try {
-            List<User> leaderboard = leaderboardService.getLeaderboard();
+            List<LeaderboardDTO> leaderboard = leaderboardService.getLeaderboard();
             return ResponseEntity.ok(leaderboard);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
@@ -44,5 +44,4 @@ public class LeaderboardController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-
 }

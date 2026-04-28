@@ -80,7 +80,7 @@ mvn clean package
 java -jar target/ipl-backend-1.0-SNAPSHOT.jar
 ```
 
-**Backend will be available at:** `http://localhost:8080/ipl-backend`
+**Backend will be available at:** `http://localhost:8081/ipl-backend`
 
 ### Step 3: Start the Frontend (Node.js)
 
@@ -90,7 +90,7 @@ npm install
 npm start
 ```
 
-**Frontend will be available at:** `http://localhost:3000`
+**Frontend will be available at:** `http://localhost:3001`
 
 ## 📡 API Endpoints
 

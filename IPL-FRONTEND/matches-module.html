@@ -132,6 +132,7 @@
 
 <script>
     // Matches Module Functions
+    const BASE_URL = "http://localhost:8081/ipl-backend";
     const teamLogos = {
         'Royal Challengers Bangalore': 'RCB',
         'Kolkata Knight Riders': 'KKR',
@@ -158,9 +159,14 @@
 
     async function loadMatchesForPrediction() {
         try {
-            const response = await fetch(`${API_BASE}/matches`);
+            const url = `${BASE_URL}/api/matches`;
+            console.log("Fetching matches from:", url);
+            const response = await fetch(url);
+            console.log("Matches response:", response.status, response.statusText);
+            
             if (response.ok) {
                 dbMatches = await response.json();
+                console.log("Matches loaded:", dbMatches.length, dbMatches);
                 const select = document.getElementById('predMatchSelect');
                 select.innerHTML = '<option value="" style="color: black;">Select a Match</option>';
                 
@@ -260,18 +266,18 @@
         const prediction = {
             userId: userId,
             matchId: parseInt(matchId),
-            winner: winner,
             tossWinner: tossWinner,
             batFirst: batFirst,
             player: player,
-            topScorer: topScorer,
-            topBowler: topBowler,
-            totalSixes: totalSixes,
-            totalRuns: totalRuns
+            winner: document.getElementById('predWinner').value,
+            topScorer: document.getElementById('predTopScorer').value,
+            topBowler: document.getElementById('predTopBowler').value,
+            totalSixes: document.getElementById('predTotalSixes').value,
+            totalRuns: document.getElementById('predTotalRuns').value
         };
 
         try {
-            const response = await fetch(`${API_BASE}/predictions`, {
+            const response = await fetch(`${BASE_URL}/api/predictions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
