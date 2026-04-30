@@ -11,40 +11,59 @@ import java.util.List;
 @Service
 public class LeaderboardService {
 
+    private final DatabaseInitializer databaseInitializer;
+
+    public LeaderboardService(DatabaseInitializer databaseInitializer) {
+        this.databaseInitializer = databaseInitializer;
+    }
+
     public List<LeaderboardDTO> getLeaderboard() throws Exception {
         List<LeaderboardDTO> leaderboard = new ArrayList<>();
+        databaseInitializer.ensureSchema();
+
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(
-                     "SELECT u.username, COALESCE(SUM(p.points), 0) AS score " +
-                             "FROM users u " +
-                             "LEFT JOIN predictions p ON u.id = p.user_id " +
-                             "GROUP BY u.id, u.username " +
-                             "ORDER BY score DESC")) {
+                     "SELECT username, COALESCE(points, 0) AS points " +
+                             "FROM users " +
+                             "ORDER BY points DESC, username ASC")) {
 
             while (rs.next()) {
                 String username = rs.getString("username");
-                int score = rs.getInt("score");
-                leaderboard.add(new LeaderboardDTO(username, score));
+                int points = rs.getInt("points");
+                leaderboard.add(new LeaderboardDTO(username, points));
             }
+
         } catch (SQLException e) {
             throw new Exception("Database error: " + e.getMessage());
         }
+
         return leaderboard;
     }
 
     public int getUserRank(Long userId) throws Exception {
+        databaseInitializer.ensureSchema();
+
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT COUNT(*) as rank FROM users WHERE score > (SELECT score FROM users WHERE id = ?)")) {
+             PreparedStatement userStmt = conn.prepareStatement("SELECT points FROM users WHERE id = ?");
+             PreparedStatement rankStmt = conn.prepareStatement(
+                     "SELECT COUNT(*) AS rank FROM users WHERE points > ?")) {
 
-            stmt.setLong(1, userId);
-            ResultSet rs = stmt.executeQuery();
+            userStmt.setLong(1, userId);
+            try (ResultSet userRs = userStmt.executeQuery()) {
+                if (!userRs.next()) {
+                    return 0;
+                }
 
-            if (rs.next()) {
-                return rs.getInt("rank") + 1;
+                rankStmt.setInt(1, userRs.getInt("points"));
+                try (ResultSet rankRs = rankStmt.executeQuery()) {
+                    if (rankRs.next()) {
+                        return rankRs.getInt("rank") + 1;
+                    }
+                }
             }
             return 0;
+
         } catch (SQLException e) {
             throw new Exception("Database error: " + e.getMessage());
         }

@@ -939,6 +939,13 @@
 
     <script>
         const API_BASE = "http://localhost:8081/ipl-backend/api";
+        let currentUser = null;
+        let currentPredictionMatch = null;
+        try {
+            currentUser = JSON.parse(localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || 'null');
+        } catch (e) {
+            currentUser = null;
+        }
         const IPL_TEAMS = [
             { name: 'Chennai Super Kings', code: 'CSK', color: '#facc15' },
             { name: 'Mumbai Indians', code: 'MI', color: '#004ba0' },
@@ -1200,6 +1207,46 @@
             const sixes = document.getElementById('predSixes')?.value || '';
             const totalRuns = document.getElementById('predTotalRuns')?.value || '';
 
+            if (!currentUser || !currentUser.id) {
+                alert('Please login to submit prediction.');
+                window.location.href = 'login.html';
+                return;
+            }
+            if (!currentPredictionMatch || !currentPredictionMatch.id) {
+                alert('No active match is available for prediction.');
+                return;
+            }
+
+            const prediction = {
+                userId: currentUser.id,
+                matchId: currentPredictionMatch.id,
+                winner: currentSelections.winner,
+                predictedTeam: currentSelections.winner,
+                tossWinner: currentSelections.toss,
+                batFirst: currentSelections.bat,
+                player: mom,
+                topScorer: topScorer,
+                topBowler: topBowler,
+                totalSixes: sixes,
+                totalRuns: totalRuns
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/predict`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(prediction)
+                });
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(result.error || 'Unable to save prediction');
+                }
+            } catch (error) {
+                alert(error.message || 'Unable to save prediction. Please try again.');
+                return;
+            }
+
             // Build summary
             let summary = `🚀 Predictions Submitted Successfully!\n\n`;
             summary += `Winner: ${currentSelections.winner}\n`;
@@ -1235,10 +1282,13 @@
                 const match = await res.json();
 
                 if(!match || !match.team1) {
+                    currentPredictionMatch = null;
                     document.getElementById('predictCardTitle').innerText = "Next Match Pending";
                     predictQuestions.innerHTML = "<p style='color:rgba(255,255,255,0.4); text-align:center; padding:20px;'>Check back soon for the next clash!</p>";
                     return;
                 }
+
+                currentPredictionMatch = match;
 
                 document.getElementById('predictCardTitle').innerText = `🎯 ${match.team1} vs ${match.team2}`;
                 predictQuestions.innerHTML = `
@@ -1353,13 +1403,17 @@
             try {
                 const res = await fetch(`${API_BASE}/leaderboard`);
                 const users = await res.json();
+                if(!res.ok) throw new Error(users.error || 'Unable to load leaderboard');
+                if(!Array.isArray(users)) throw new Error('Invalid leaderboard response');
 
                 if(!users || users.length === 0) {
                     list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color:rgba(255,255,255,0.4);">Leaderboard is currently empty.</td></tr>';
                     return;
                 }
 
-                list.innerHTML = users.map((u, i) => `
+                list.innerHTML = users.map((u, i) => {
+                    const points = Number(u.points ?? u.score ?? 0);
+                    return `
                     <tr style="background: ${u.username === 'IPLFan' ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255,255,255,0.03)'}; border-radius: 16px;">
                         <td style="padding: 18px; text-align: center; font-weight: 900; color: ${i < 3 ? '#facc15' : 'rgba(255,255,255,0.5)'};">
                             ${i < 3 ? ['🥇', '🥈', '🥉'][i] : (i + 1)}
@@ -1372,17 +1426,17 @@
                                 <span style="font-weight:800; color: white;">${u.username}</span>
                             </div>
                         </td>
-                        <td style="padding: 18px; text-align: center; font-weight: 900; color: #facc15;">${u.score || 0}</td>
+                        <td style="padding: 18px; text-align: center; font-weight: 900; color: #facc15;">${points}</td>
                         <td style="padding: 18px; text-align: center;">
-                            <button onclick="openUserStatsModal('${u.username}', ${u.score || 0}, ${i + 1})" style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; padding: 6px 16px; border-radius: 12px; font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;">VIEW STATS</button>
+                            <button onclick="openUserStatsModal('${u.username}', ${points}, ${i + 1})" style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; padding: 6px 16px; border-radius: 12px; font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;">VIEW STATS</button>
                         </td>
                     </tr>
-                `).join('');
+                `}).join('');
 
                 // Also update podium section
                 renderPodium(users.slice(0, 3));
             } catch (e) {
-                list.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#ff4d6d; padding:40px;">Leaderboard fetch failed.</td></tr>';
+                list.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#ff4d6d; padding:40px;">Unable to load leaderboard. Please try again.</td></tr>';
             }
         }
 
@@ -1401,6 +1455,7 @@
 
                 const rank = idx + 1;
                 const isFirst = rank === 1;
+                const points = Number(user.points ?? user.score ?? 0);
                 
                 const initials = user.username.substring(0, 2).toUpperCase();
                 
@@ -1473,7 +1528,7 @@
                         ${initials}
                     </div>
                     <div style="font-weight: 800; font-size: ${s.nameSize}; color: white; letter-spacing: -0.5px;">${user.username}</div>
-                    <div style="color: ${s.ptsColor}; font-size: ${s.ptsSize}; font-weight: 900; margin: 12px 0;">${user.score.toLocaleString()}</div>
+                    <div style="color: ${s.ptsColor}; font-size: ${s.ptsSize}; font-weight: 900; margin: 12px 0;">${points.toLocaleString()}</div>
                     <div style="${s.accuracyBg}; padding: 5px 12px; color: ${s.accuracyColor}; font-size: 12px; font-weight: 700; display: inline-block;">${accuracy}% Accuracy</div>
                 `;
                 
@@ -1687,29 +1742,61 @@
             window.location.href = 'login.html';
         }
 
-        async function syncData() {
-            const btn = document.getElementById('syncBtn');
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = 'SYNCING...';
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
+         async function syncData() {
+             const btn = document.getElementById('syncBtn');
+             if (!btn) return;
 
-            try {
-                const res = await fetch(`${API_BASE}/matches/sync`);
-                if(res.ok) {
-                    alert('✅ Database Synced with Official IPL Schedule!');
-                    location.reload();
-                } else {
-                    alert('❌ Sync failed. Please ensure the backend is running.');
-                }
-            } catch (e) {
-                alert('❌ Connection Error. Backend might be down.');
-            } finally {
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-                btn.style.opacity = '1';
-            }
-        }
+             const originalContent = btn.innerHTML;
+             btn.disabled = true;
+             btn.innerHTML = '<span style="display: inline-block; width: 8px; height: 8px; background: #fbbf24; border-radius: 50%; box-shadow: 0 0 10px #fbbf24; animation: pulse 1.5s infinite;"></span> SYNCING...';
+
+             try {
+                 // Use extended timeout for slow feed
+                 const controller = new AbortController();
+                 const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+                 const response = await fetch(`${API_BASE}/matches/sync`, {
+                     method: 'GET',
+                     credentials: 'include',
+                     signal: controller.signal
+                 });
+
+                 clearTimeout(timeoutId);
+
+                 if (!response.ok) {
+                     const errorText = await response.text();
+                     throw new Error(`Sync failed (${response.status}): ${errorText.substring(0, 200)}`);
+                 }
+
+                 const data = await response.json();
+
+                 // Refresh all displayed data
+                 await setCarousel('past');
+                 await setCarousel('upcoming');
+                 renderTeams();
+                 if (data.today || (Array.isArray(data) && data.length > 0)) {
+                     renderTodayCard(Array.isArray(data) ? data[0] : data.today);
+                 }
+
+                 btn.innerHTML = '<span style="display: inline-block; width: 8px; height: 8px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 10px #4ade80;"></span> SYNCED';
+                 setTimeout(() => {
+                     btn.innerHTML = originalContent;
+                     btn.disabled = false;
+                 }, 2000);
+
+             } catch (error) {
+                 console.error('Sync error:', error);
+                 let msg = 'Sync failed: ';
+                 if (error.name === 'AbortError') {
+                     msg = 'Sync timed out - The IPL feed is taking too long to respond.';
+                 } else {
+                     msg += error.message;
+                 }
+                 alert(msg);
+                 btn.innerHTML = originalContent;
+                 btn.disabled = false;
+             }
+         }
 
         function currentSlide(n) {
             clearInterval(slideInterval); // Reset timer on manual click

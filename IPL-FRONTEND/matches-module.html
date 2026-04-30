@@ -253,15 +253,13 @@
             return;
         }
 
-        // Use logged in user if available, otherwise fallback to 1
-        let userId = 1; 
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
-            try {
-                const user = JSON.parse(userStr);
-                userId = user.id || 1;
-            } catch (e) {}
+        // Use logged in user
+        if (!window.currentUser) {
+            alert('Please login to submit prediction');
+            openLoginModal();
+            return;
         }
+        const userId = window.currentUser.id;
 
         const prediction = {
             userId: userId,
@@ -270,6 +268,7 @@
             batFirst: batFirst,
             player: player,
             winner: document.getElementById('predWinner').value,
+            predictedTeam: document.getElementById('predWinner').value,
             topScorer: document.getElementById('predTopScorer').value,
             topBowler: document.getElementById('predTopBowler').value,
             totalSixes: document.getElementById('predTotalSixes').value,
@@ -284,6 +283,7 @@
                 },
                 body: JSON.stringify(prediction)
             });
+            const result = await response.json().catch(() => ({}));
 
             if (response.ok) {
                 alert('🎉 All predictions submitted successfully! You earned points for each correct prediction.');
@@ -299,11 +299,11 @@
                 document.getElementById('predTotalRuns').value = '';
                 updatePotentialPoints();
             } else {
-                throw new Error('Submission failed');
+                throw new Error(result.error || 'Submission failed');
             }
         } catch (error) {
             console.error('Prediction error:', error);
-            alert('Failed to submit prediction');
+            alert(error.message || 'Unable to submit prediction. Please try again.');
         }
     }
 
@@ -319,6 +319,22 @@
     document.head.appendChild(style);
 
     // Initial Load
-
     loadMatchesForPrediction();
+    
+    // Check session
+    async function checkSession() {
+        try {
+            const response = await fetch(`${BASE_URL}/api/auth`, { credentials: 'include' });
+            if (response.ok) {
+                const user = await response.json();
+                window.currentUser = user;
+                console.log("Session user:", user);
+            } else {
+                window.currentUser = null;
+            }
+        } catch (e) {
+            window.currentUser = null;
+        }
+    }
+    checkSession();
 </script>

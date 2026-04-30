@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/predictions")
-@CrossOrigin(origins = {"http://localhost:3001", "http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:8080"})
+@RequestMapping({"/api/predictions", "/api/predict"})
 public class PredictionController {
 
     @Autowired
@@ -24,10 +23,27 @@ public class PredictionController {
         try {
             Prediction created = predictionService.createPrediction(prediction);
             return ResponseEntity.ok(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error(e.getMessage()));
         } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/evaluate/{matchId}")
+    public ResponseEntity<?> evaluatePredictions(@PathVariable Long matchId,
+                                                 @RequestBody(required = false) Map<String, String> result) {
+        try {
+            String actualWinner = result == null ? null : result.get("actualWinner");
+            int evaluated = predictionService.evaluatePrediction(matchId, actualWinner);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Predictions evaluated successfully");
+            response.put("evaluated", evaluated);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error(e.getMessage()));
         }
     }
 
@@ -37,9 +53,7 @@ public class PredictionController {
             List<Prediction> predictions = predictionService.getUserPredictions(userId);
             return ResponseEntity.ok(predictions);
         } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error(e.getMessage()));
         }
     }
 
@@ -49,9 +63,7 @@ public class PredictionController {
             List<Prediction> predictions = predictionService.getMatchPredictions(matchId);
             return ResponseEntity.ok(predictions);
         } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error(e.getMessage()));
         }
     }
 
@@ -62,13 +74,16 @@ public class PredictionController {
             if (prediction != null) {
                 return ResponseEntity.ok(prediction);
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new HashMap<>());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error("Prediction not found"));
             }
         } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error(e.getMessage()));
         }
     }
 
+    private Map<String, String> error(String message) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", message);
+        return error;
+    }
 }

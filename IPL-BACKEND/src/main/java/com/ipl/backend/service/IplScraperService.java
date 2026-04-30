@@ -27,12 +27,14 @@ public class IplScraperService {
     /**
      * Fetches match data from the official IPL feed and returns a list of Match objects.
      */
-    public List<Match> fetchMatches() throws Exception {
-        // Fetch the JSONP response
-        String jsonp = Jsoup.connect(FEED_URL)
-                .ignoreContentType(true)
-                .execute()
-                .body();
+     public List<Match> fetchMatches() throws Exception {
+         // Fetch the JSONP response with extended timeout for large feed (~750KB)
+         String jsonp = Jsoup.connect(FEED_URL)
+                 .ignoreContentType(true)
+                 .timeout(60000) // 60 seconds
+                 .maxBodySize(0) // unlimited
+                 .execute()
+                 .body();
 
         // Strip JSONP callback: MatchSchedule({ ... });
         int start = jsonp.indexOf('{');
@@ -79,12 +81,14 @@ public class IplScraperService {
         }
     }
 
-    // Returns raw feed data - helpful for bypassing CORS
-    public String fetchRawFeed() throws Exception {
-        String jsonp = Jsoup.connect(FEED_URL)
-                .ignoreContentType(true)
-                .execute()
-                .body();
-        return jsonp;
-    }
+     // Returns raw feed data - helpful for bypassing CORS
+     public String fetchRawFeed() throws Exception {
+         String jsonp = Jsoup.connect(FEED_URL)
+                 .ignoreContentType(true)
+                 .timeout(60000) // 60 seconds
+                 .maxBodySize(0) // unlimited
+                 .execute()
+                 .body();
+         return jsonp;
+     }
 }

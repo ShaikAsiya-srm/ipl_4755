@@ -6,10 +6,11 @@ import com.ipl.backend.service.MatchService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"http://localhost:3001", "http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:8080"})
 public class MatchController {
 
     private final IplScraperService scraper;
@@ -31,14 +32,28 @@ public class MatchController {
     }
 
     @GetMapping("/matches/sync")
-    public List<Match> syncMatches() throws Exception {
-        scraper.syncMatches();
-        return matchService.getAllMatches();
+    public Map<String, String> syncMatches() {
+
+        new Thread(() -> {
+            try {
+                scraper.syncMatches();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Sync started in background 🚀");
+        return response;
     }
 
-    // New endpoint - fetches directly from IPL feed (bypasses CORS)
     @GetMapping("/matches/live")
     public String getLiveMatches() throws Exception {
         return scraper.fetchRawFeed();
+    }
+
+    @GetMapping("/ping")
+    public String ping() {
+        return "Backend is working 🚀";
     }
 }

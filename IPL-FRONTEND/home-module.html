@@ -254,7 +254,7 @@
             openLoginModal();
         }
     }
-    
+
     async function loadAllMatches() {
         try {
             const response = await fetch(`${API_BASE}/matches`);
@@ -330,4 +330,19 @@
         await loadTodayMatch();
         await loadAllMatches();
     });
+
+    // Global for other scripts
+    window.currentUser = null;
+    async function checkSession() {
+        try {
+            const response = await fetch(`${API_BASE}/auth`, { credentials: 'include' });
+            if (response.ok) {
+                window.currentUser = await response.json();
+                console.log("Session user:", window.currentUser);
+            }
+        } catch (e) {
+            window.currentUser = null;
+        }
+    }
+    checkSession();
 </script>

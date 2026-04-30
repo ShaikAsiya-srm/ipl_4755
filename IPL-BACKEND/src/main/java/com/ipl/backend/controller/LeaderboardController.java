@@ -3,7 +3,6 @@ package com.ipl.backend.controller;
 import com.ipl.backend.model.LeaderboardDTO;
 import com.ipl.backend.service.LeaderboardService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/leaderboard")
-@CrossOrigin(origins = {"http://localhost:3001", "http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:8080"})
 public class LeaderboardController {
 
     @Autowired
@@ -25,9 +23,10 @@ public class LeaderboardController {
             List<LeaderboardDTO> leaderboard = leaderboardService.getLeaderboard();
             return ResponseEntity.ok(leaderboard);
         } catch (Exception e) {
+            e.printStackTrace();  // 👈 to see real error in console
             Map<String, String> error = new HashMap<>();
             error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            return ResponseEntity.status(500).body(error);
         }
     }
 
@@ -39,9 +38,10 @@ public class LeaderboardController {
             response.put("rank", rank);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            e.printStackTrace();
             Map<String, String> error = new HashMap<>();
             error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            return ResponseEntity.status(500).body(error);
         }
     }
 }

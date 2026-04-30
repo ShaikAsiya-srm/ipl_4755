@@ -6,8 +6,8 @@ import java.sql.SQLException;
 
 public class DBConnection {
 
-    // Using H2 for development - change to Oracle for production
-    private static final String URL = "jdbc:h2:mem:ipldb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE";
+    // Persistent H2 file database. Path is relative to the backend working directory.
+    private static final String URL = "jdbc:h2:file:./data/ipldb;DB_CLOSE_ON_EXIT=FALSE";
     private static final String USER = "sa";
     private static final String PASSWORD = "";
 

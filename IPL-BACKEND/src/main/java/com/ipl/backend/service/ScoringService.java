@@ -7,58 +7,57 @@ import org.springframework.stereotype.Service;
 @Service
 public class ScoringService {
 
+    /**
+     * Calculate points earned for a prediction based on actual match results.
+     * Maximum possible: 80 points
+     */
     public int calculatePoints(Prediction prediction, Match match) {
+        if (match == null || prediction == null) {
+            return 0;
+        }
+
         int points = 0;
 
-        // Correct match winner: +20
-        if (prediction.getWinner() != null && prediction.getWinner().equalsIgnoreCase(match.getActualWinner())) {
+        // 1. Match winner (20 points)
+        if (prediction.getWinner() != null && 
+            prediction.getWinner().equalsIgnoreCase(match.getActualWinner())) {
             points += 20;
         }
 
-        // Correct toss winner: +5
-        if (prediction.getTossWinner() != null && prediction.getTossWinner().equalsIgnoreCase(match.getTossWinner())) {
+        // 2. Toss winner (5 points)
+        if (prediction.getTossWinner() != null && 
+            prediction.getTossWinner().equalsIgnoreCase(match.getTossWinner())) {
             points += 5;
         }
 
-        // Correct bat first: +5
-        if (prediction.getBatFirst() != null && prediction.getBatFirst().equalsIgnoreCase(match.getBatFirst())) {
+        // 3. Bat first (5 points)
+        if (prediction.getBatFirst() != null && 
+            prediction.getBatFirst().equalsIgnoreCase(match.getBatFirst())) {
             points += 5;
         }
 
-        // Correct top scorer: +15
-        if (prediction.getTopScorer() != null && prediction.getTopScorer().equalsIgnoreCase(match.getTopScorer())) {
+        // 4. Top scorer (15 points)
+        if (prediction.getTopScorer() != null && 
+            prediction.getTopScorer().equalsIgnoreCase(match.getTopScorer())) {
             points += 15;
         }
 
-        // Correct top bowler: +15
-        if (prediction.getTopBowler() != null && prediction.getTopBowler().equalsIgnoreCase(match.getTopBowler())) {
+        // 5. Top bowler (15 points)
+        if (prediction.getTopBowler() != null && 
+            prediction.getTopBowler().equalsIgnoreCase(match.getTopBowler())) {
             points += 15;
         }
 
-        // Correct total sixes range: +10
-        if (prediction.getTotalSixes() != null && match.getActualTotalSixes() != null) {
-            try {
-                int predictedSixes = Integer.parseInt(prediction.getTotalSixes().trim());
-                int actualSixes = Integer.parseInt(match.getActualTotalSixes().trim());
-                if (Math.abs(predictedSixes - actualSixes) <= 2) {
-                    points += 10;
-                }
-            } catch (NumberFormatException e) {
-                // If parsing fails, no points
-            }
+        // 6. Total sixes range (10 points)
+        if (prediction.getTotalSixes() != null && 
+            prediction.getTotalSixes().equalsIgnoreCase(match.getActualTotalSixes())) {
+            points += 10;
         }
 
-        // Correct total runs range: +10
-        if (prediction.getTotalRuns() != null && match.getActualTotalRuns() != null) {
-            try {
-                int predictedRuns = Integer.parseInt(prediction.getTotalRuns().trim());
-                int actualRuns = Integer.parseInt(match.getActualTotalRuns().trim());
-                if (Math.abs(predictedRuns - actualRuns) <= 10) {
-                    points += 10;
-                }
-            } catch (NumberFormatException e) {
-                // If parsing fails, no points
-            }
+        // 7. Total runs range (10 points)
+        if (prediction.getTotalRuns() != null && 
+            prediction.getTotalRuns().equalsIgnoreCase(match.getActualTotalRuns())) {
+            points += 10;
         }
 
         return points;

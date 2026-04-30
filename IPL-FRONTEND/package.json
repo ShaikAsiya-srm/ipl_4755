@@ -8,7 +8,8 @@
     "dev": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "react-router-dom": "^7.14.2"
   },
   "author": "",
   "license": "ISC"

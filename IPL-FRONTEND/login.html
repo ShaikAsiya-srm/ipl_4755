@@ -265,18 +265,20 @@
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            const action = isLogin ? 'login' : 'register';
+            const endpoint = isLogin ? '/auth/login' : '/auth/register';
 
             try {
-                const response = await fetch(`${API_BASE}/auth?action=${action}`, {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
+                    body: JSON.stringify({ username, password, email: '' }),
                     credentials: 'include'
                 });
 
                 if (response.ok) {
                     const user = await response.json();
+                    // Store user in sessionStorage for quick access
+                    sessionStorage.setItem('currentUser', JSON.stringify(user));
                     window.location.href = '/dashboard';
                 } else {
                     const error = await response.json();
